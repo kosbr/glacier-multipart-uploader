@@ -1,6 +1,8 @@
-package com.github.kosbr.aws.config;
+package com.github.kosbr.aws;
 
+import com.github.kosbr.aws.commands.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.exit.ExitHandler;
+import com.github.kosbr.aws.config.GlacierUploaderConfigurationHolder;
 import com.github.kosbr.cli.ConsoleManager;
 import com.github.kosbr.cli.registry.CommandRegistry;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,7 @@ public class SpringConfiguration {
     public CommandRegistry commandRegistry() {
         final CommandRegistry commandRegistry = new CommandRegistry();
         commandRegistry.registerCommand("exit", exitHandler());
+        commandRegistry.registerCommand("configure", configureHandler());
         return commandRegistry;
     }
 
@@ -22,7 +25,17 @@ public class SpringConfiguration {
     }
 
     @Bean
+    public GlacierUploaderConfigurationHolder glacierUploaderConfigurationHolder() {
+        return new GlacierUploaderConfigurationHolder();
+    }
+
+    @Bean
     public ExitHandler exitHandler() {
         return new ExitHandler();
+    }
+
+    @Bean
+    public ConfigureHandler configureHandler() {
+        return new ConfigureHandler();
     }
 }

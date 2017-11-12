@@ -1,6 +1,5 @@
 package com.github.kosbr.aws;
 
-import com.github.kosbr.aws.config.SpringConfiguration;
 import com.github.kosbr.cli.ConsoleManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
