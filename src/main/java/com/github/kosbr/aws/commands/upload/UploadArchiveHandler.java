@@ -22,7 +22,7 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
         try {
             client.uploadArchive(description, printStream);
         } catch (Throwable e) {
-            printStream.println("Error: "+ e.getMessage());
+            printStream.println("Error: " + e.getMessage());
         }
         return true;
     }
