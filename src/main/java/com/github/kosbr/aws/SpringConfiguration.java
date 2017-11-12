@@ -1,7 +1,10 @@
 package com.github.kosbr.aws;
 
+import com.github.kosbr.aws.client.AWSGlacierClient;
+import com.github.kosbr.aws.client.AWSGlacierClientImpl;
 import com.github.kosbr.aws.commands.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.exit.ExitHandler;
+import com.github.kosbr.aws.commands.upload.UploadArchiveHandler;
 import com.github.kosbr.aws.config.GlacierUploaderConfigurationHolder;
 import com.github.kosbr.cli.ConsoleManager;
 import com.github.kosbr.cli.registry.CommandRegistry;
@@ -16,6 +19,7 @@ public class SpringConfiguration {
         final CommandRegistry commandRegistry = new CommandRegistry();
         commandRegistry.registerCommand("exit", exitHandler());
         commandRegistry.registerCommand("configure", configureHandler());
+        commandRegistry.registerCommand("upload", uploadArchiveHandler());
         return commandRegistry;
     }
 
@@ -30,6 +34,11 @@ public class SpringConfiguration {
     }
 
     @Bean
+    public AWSGlacierClient awsGlacierClient() {
+        return new AWSGlacierClientImpl();
+    }
+
+    @Bean
     public ExitHandler exitHandler() {
         return new ExitHandler();
     }
@@ -37,5 +46,10 @@ public class SpringConfiguration {
     @Bean
     public ConfigureHandler configureHandler() {
         return new ConfigureHandler();
+    }
+
+    @Bean
+    public UploadArchiveHandler uploadArchiveHandler() {
+        return new UploadArchiveHandler();
     }
 }
