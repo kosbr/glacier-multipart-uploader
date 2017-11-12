@@ -9,7 +9,7 @@ import java.io.PrintStream;
 public class ExitHandler implements CommandHandler<ExitOptions> {
 
     @Override
-    public boolean handle(ExitOptions options, PrintStream printStream) {
+    public boolean handle(final ExitOptions options, final PrintStream printStream) {
         printStream.println("Good bye");
         return false;
     }

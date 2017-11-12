@@ -5,9 +5,13 @@ import com.github.kosbr.cli.ConsoleManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class GlacierUploaderApplication {
+public final class GlacierUploaderApplication {
 
-    public static void main(String[] args) {
+    private GlacierUploaderApplication() {
+
+    }
+
+    public static void main(final String[] args) {
         final ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfiguration.class);
         final ConsoleManager consoleManager = context.getBean(ConsoleManager.class);
         consoleManager.start();

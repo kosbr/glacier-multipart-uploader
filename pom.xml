@@ -21,6 +21,14 @@
         <cli-helper.version>1.1</cli-helper.version>
 
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
+
+        <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
+        <maven.findbugs.plugin.version>3.0.3</maven.findbugs.plugin.version>
+        <maven.pmd.plugin.version>3.6</maven.pmd.plugin.version>
+
+        <checkstyle.level>warning</checkstyle.level>
+        <checkstyle.file.url>strict/checkstyle.xml</checkstyle.file.url>
+        <findbugs.exclude.file.url>strict/findbugs-exclude.xml</findbugs.exclude.file.url>
     </properties>
 
     <dependencies>
@@ -57,6 +65,74 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>strict</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${maven-checkstyle-plugin.version}</version>
+                        <configuration>
+                            <enableRulesSummary>false</enableRulesSummary>
+                            <configLocation>${checkstyle.file.url}</configLocation>
+                            <consoleOutput>false</consoleOutput>
+                            <logViolationsToConsole>true</logViolationsToConsole>
+                            <violationSeverity>${checkstyle.level}</violationSeverity>
+                            <encoding>UTF-8</encoding>
+                            <excludes>**/generated/**/*</excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>${maven.findbugs.plugin.version}</version>
+                        <configuration>
+                            <failOnError>true</failOnError>
+                            <excludeFilterFile>${findbugs.exclude.file.url}</excludeFilterFile>
+                            <findbugsXmlOutput>true</findbugsXmlOutput>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--PMD-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <version>${maven.pmd.plugin.version}</version>
+                        <configuration>
+                            <failOnViolation>true</failOnViolation>
+                            <verbose>true</verbose>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 
 </project>
