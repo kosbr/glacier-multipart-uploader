@@ -26,7 +26,7 @@ public class GlacierUploaderConfigurationImpl implements GlacierUploaderConfigur
         return signingRegion;
     }
 
-    public void display(PrintStream printStream) {
+    public void display(final PrintStream printStream) {
         printStream.println("Service endpoint: " + serviceEndpoint);
         printStream.println("Signing region: " + signingRegion);
     }

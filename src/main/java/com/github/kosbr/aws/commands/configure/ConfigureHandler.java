@@ -1,6 +1,5 @@
 package com.github.kosbr.aws.commands.configure;
 
-import com.github.kosbr.aws.config.GlacierUploaderConfiguration;
 import com.github.kosbr.aws.config.GlacierUploaderConfigurationHolder;
 import com.github.kosbr.aws.config.GlacierUploaderConfigurationImpl;
 import com.github.kosbr.cli.CommandHandler;
@@ -11,19 +10,20 @@ import java.util.Properties;
 
 public class ConfigureHandler implements CommandHandler<ConfigureOptions> {
 
-    public static final String PROP_AWS_SERVICE_ENDPOINT = "aws.service.endpoint";
-    public static final String PROP_AWS_SIGNING_REGION = "aws.signing.region";
+    private static final String PROP_AWS_SERVICE_ENDPOINT = "aws.service.endpoint";
+    private static final String PROP_AWS_SIGNING_REGION = "aws.signing.region";
+
     @Autowired
     private GlacierUploaderConfigurationHolder configurationHolder;
 
     @Override
-    public boolean handle(ConfigureOptions options, PrintStream printStream) {
+    public boolean handle(final ConfigureOptions options, final PrintStream printStream) {
         final String filepath = options.getPath();
         final Properties prop = new Properties();
 
         try (InputStream input = new FileInputStream(filepath)) {
             prop.load(input);
-            GlacierUploaderConfigurationImpl config = readConfig(prop, printStream);
+            final GlacierUploaderConfigurationImpl config = readConfig(prop, printStream);
             if (config == null) {
                 printStream.println("Configuration hasn't been updated due to errors");
                 return true;
@@ -48,7 +48,9 @@ public class ConfigureHandler implements CommandHandler<ConfigureOptions> {
     private boolean checkNotNull(final String property,
                               final String propertyName,
                               final PrintStream printStream) {
-        if (property != null) return true;
+        if (property != null) {
+            return true;
+        }
         printStream.println("Error: property " + propertyName + " is null");
         return false;
     }
