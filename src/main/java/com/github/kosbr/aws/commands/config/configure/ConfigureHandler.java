@@ -35,7 +35,7 @@ public class ConfigureHandler implements DialogCommandHandler<ConfigureOptions> 
             printStream.println("Signing region: " + signingRegion);
             printStream.println("Print exit if there is a mistake and launch the command one more time.");
             printStream.println("If everything is ok, press Enter");
-            if (EXIT.equalsIgnoreCase(safeReadLine(bufferedReader))) {
+            if (EXIT.equalsIgnoreCase(safeReadLine(bufferedReader, printStream, true))) {
                 throw new InterruptedCommandException();
             }
             final UploaderConfiguration configuration = new UploaderConfiguration();
@@ -62,7 +62,7 @@ public class ConfigureHandler implements DialogCommandHandler<ConfigureOptions> 
     private String getName(final BufferedReader bufferedReader,
                            final PrintStream printStream) throws InterruptedCommandException {
         printStream.println("Enter the name of the new configuration");
-        final String wishedName = safeReadLine(bufferedReader);
+        final String wishedName = safeReadLine(bufferedReader, printStream, false);
         if (EXIT.equalsIgnoreCase(wishedName)) {
             throw new InterruptedCommandException();
         }
@@ -78,21 +78,24 @@ public class ConfigureHandler implements DialogCommandHandler<ConfigureOptions> 
                                      final PrintStream printStream,
                                      final String nameStr) throws InterruptedCommandException {
         printStream.println("Enter the " + nameStr + " of the new configuration");
-        final String wishedValue = safeReadLine(bufferedReader);
+        final String wishedValue = safeReadLine(bufferedReader, printStream, false);
         if (EXIT.equals(wishedValue.toLowerCase())) {
             throw new InterruptedCommandException();
         }
-        if (StringUtils.isEmpty(wishedValue)) {
-            printStream.println("The value shouldn't be empty");
-            return getNotEmptyString(bufferedReader, printStream, nameStr);
-        } else {
-            return wishedValue;
-        }
+        return wishedValue;
     }
 
-    private String safeReadLine(final BufferedReader reader) {
+    private String safeReadLine(final BufferedReader reader,
+                                final PrintStream printStream,
+                                final boolean allowEmpty) {
         try {
-            return reader.readLine();
+            final String input = reader.readLine();
+            if (!allowEmpty && StringUtils.isEmpty(input)) {
+                printStream.println("The value shouldn't be empty. Please, enter not empty value:");
+                return safeReadLine(reader, printStream, false);
+            } else {
+                return input;
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
