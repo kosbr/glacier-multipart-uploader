@@ -25,7 +25,6 @@ public class DAOConfiguration {
     private static final String DB_CONNECTION = "jdbc:h2:~/.aws/aws-uploader";
     private static final String DB_USER = "";
     private static final String DB_PASSWORD = "";
-    private static final String TRUE = "true";
 
     @Bean
     public DriverManagerDataSource dataSource() {
@@ -39,7 +38,7 @@ public class DAOConfiguration {
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {
         final HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
-        hibernateJpaVendorAdapter.setShowSql(true);
+        hibernateJpaVendorAdapter.setShowSql(false);
         hibernateJpaVendorAdapter.setDatabase(Database.H2);
         return hibernateJpaVendorAdapter;
     }
@@ -49,9 +48,7 @@ public class DAOConfiguration {
         final Properties jpaProperties = new Properties();
         jpaProperties.put(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
         jpaProperties.put(Environment.HBM2DDL_AUTO, "update");
-        jpaProperties.put(Environment.SHOW_SQL, TRUE);
-        jpaProperties.put(Environment.FORMAT_SQL, TRUE);
-        jpaProperties.put(Environment.USE_SQL_COMMENTS, TRUE);
+        jpaProperties.put(Environment.SHOW_SQL, "false");
         return jpaProperties;
     }
 
