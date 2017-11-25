@@ -4,6 +4,7 @@ import com.github.kosbr.aws.client.AWSGlacierClient;
 import com.github.kosbr.aws.client.AWSGlacierClientImpl;
 import com.github.kosbr.aws.commands.config.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.config.list.ConfigListHandler;
+import com.github.kosbr.aws.commands.config.use.ConfigUseHandler;
 import com.github.kosbr.aws.commands.exit.ExitHandler;
 import com.github.kosbr.aws.commands.upload.UploadArchiveHandler;
 import com.github.kosbr.cli.ConsoleManager;
@@ -20,6 +21,7 @@ public class HandlersConfiguration {
         commandRegistry.registerCommand("exit", exitHandler());
         commandRegistry.registerCommand("configure", configureHandler());
         commandRegistry.registerCommand("configlist", configListHandler());
+        commandRegistry.registerCommand("configuse", configUseHandler());
         commandRegistry.registerCommand("upload", uploadArchiveHandler());
         return commandRegistry;
     }
@@ -45,9 +47,15 @@ public class HandlersConfiguration {
     }
 
     @Bean
+    public ConfigUseHandler configUseHandler() {
+        return new ConfigUseHandler();
+    }
+
+    @Bean
     public ConfigListHandler configListHandler() {
         return new ConfigListHandler();
     }
+
 
     @Bean
     public UploadArchiveHandler uploadArchiveHandler() {
