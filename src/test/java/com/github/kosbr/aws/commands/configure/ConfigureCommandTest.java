@@ -19,7 +19,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -27,6 +26,8 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {HandlersConfiguration.class, MockConfigurationServiceConfiguration.class})
 public class ConfigureCommandTest {
+
+    private static final String EXIT = "exit";
 
     @Autowired
     private ConfigureHandler configureHandler;
@@ -82,6 +83,40 @@ public class ConfigureCommandTest {
                 "If everything is ok, press Enter",
                 "The configuration has been saved.",
                 "If you would like to use it, make it active by 'use' command");
+
+        Assert.assertEquals(expectedOutput, printStreamWrapper.getOutContent());
+    }
+
+    @Test
+    public void testCreateConfigurationInterruption() throws InvalidConfigurationException, ConfigurationExistsException {
+
+        final String configurationName = "test";
+        final String serviceEndPoint = "endpoint";
+
+        when(configurationServiceMock.findByName(configurationName))
+                .thenReturn(Optional.empty());
+
+        final BufferedReader bufferedReader = SequenceBuilder.create()
+                .addLine(configurationName)
+                .addLine(serviceEndPoint)
+                .addLine(EXIT)
+                .getAsBufferedReader();
+
+        final PrintStreamWrapper printStreamWrapper = new PrintStreamWrapper();
+        final ConfigureOptions options = new ConfigureOptions();
+        configureHandler.handle(options, printStreamWrapper.getPrintStream(), bufferedReader);
+
+        verify(configurationServiceMock).findByName(configurationName);
+        verifyNoMoreInteractions(configurationServiceMock);
+
+        final String expectedOutput = SequenceBuilder.createSequence(
+                "This command will ask you questions about new configuration",
+                "Print exit if you want to interrupt configuration creating",
+                "Enter the name of the new configuration",
+                "Enter the service endpoint of the new configuration",
+                "Enter the signing region of the new configuration",
+                "The command has been interrupted"
+        );
 
         Assert.assertEquals(expectedOutput, printStreamWrapper.getOutContent());
     }
