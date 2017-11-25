@@ -24,7 +24,7 @@ public class ConfigureHandler implements DialogCommandHandler<ConfigureOptions> 
                           final PrintStream printStream,
                           final BufferedReader bufferedReader) {
         printStream.println("This command will ask you questions about new configuration");
-        printStream.println("Type exit if you want to interrupt configuration creating");
+        printStream.println("Print exit if you want to interrupt configuration creating");
         try {
             final String name = getName(bufferedReader, printStream);
             final String serviceEndpoint = getNotEmptyString(bufferedReader, printStream, "service endpoint");
