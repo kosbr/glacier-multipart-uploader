@@ -2,6 +2,7 @@ package com.github.kosbr.aws.commands.upload;
 
 import com.github.kosbr.aws.client.AWSArchiveDescription;
 import com.github.kosbr.aws.client.AWSGlacierClient;
+import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
 import com.github.kosbr.cli.CommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,6 +22,8 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
 
         try {
             client.uploadArchive(description, printStream);
+        } catch (NoActiveConfiguration e) {
+            printStream.println("There is no active configuration");
         } catch (Throwable e) {
             printStream.println("Error: " + e.getMessage());
         }

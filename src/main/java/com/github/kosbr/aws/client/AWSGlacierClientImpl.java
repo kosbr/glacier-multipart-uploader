@@ -7,8 +7,9 @@ import com.amazonaws.services.glacier.AmazonGlacierClientBuilder;
 import com.amazonaws.services.glacier.TreeHashGenerator;
 import com.amazonaws.services.glacier.model.*;
 import com.amazonaws.util.BinaryUtils;
-import com.github.kosbr.aws.config.GlacierUploaderConfiguration;
-import com.github.kosbr.aws.config.GlacierUploaderConfigurationHolder;
+import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
+import com.github.kosbr.aws.model.UploaderConfiguration;
+import com.github.kosbr.aws.service.UploaderConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
@@ -25,12 +26,15 @@ public class AWSGlacierClientImpl implements AWSGlacierClient {
 
     private AmazonGlacier client;
 
+    private String clientConfigName;
+
     @Autowired
-    private GlacierUploaderConfigurationHolder configurationHolder;
+    private UploaderConfigurationService uploaderConfigurationService;
 
     @Override
     public void uploadArchive(final AWSArchiveDescription description,
-                              final PrintStream printStream) throws IOException, NoSuchAlgorithmException {
+                              final PrintStream printStream)
+            throws IOException, NoSuchAlgorithmException, NoActiveConfiguration {
         provideClientReady();
 
         printStream.println("Uploading an archive.");
@@ -127,17 +131,20 @@ public class AWSGlacierClientImpl implements AWSGlacierClient {
         return compResult.getLocation();
     }
 
-    private void provideClientReady() {
-        if (client == null) {
+    private void provideClientReady() throws NoActiveConfiguration {
+        final UploaderConfiguration activeConfiguration = uploaderConfigurationService.findActiveConfiguration();
+
+        // if client is null (first launch) or active configuration has been changed
+        if (client == null || !activeConfiguration.getName().equals(clientConfigName)) {
             final ProfileCredentialsProvider credentials = new ProfileCredentialsProvider();
-            final GlacierUploaderConfiguration configuration = configurationHolder.getConfiguration();
             client = AmazonGlacierClientBuilder.standard()
                     .withCredentials(credentials)
                     .withEndpointConfiguration(
                             new AwsClientBuilder.EndpointConfiguration(
-                                    configuration.getServiceEndpoint(),
-                                    configuration.getSigningRegion())
+                                    activeConfiguration.getServiceEndpoint(),
+                                    activeConfiguration.getSigningRegion())
                     ).build();
+            clientConfigName = activeConfiguration.getName();
         }
     }
 }
