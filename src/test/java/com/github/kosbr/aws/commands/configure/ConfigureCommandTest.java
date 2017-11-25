@@ -61,6 +61,8 @@ public class ConfigureCommandTest {
         final ConfigureOptions options = new ConfigureOptions();
         configureHandler.handle(options, printStreamWrapper.getPrintStream(), bufferedReader);
 
+        verify(configurationServiceMock).findByName(configurationName);
+
         final ArgumentCaptor<UploaderConfiguration> configArg = ArgumentCaptor.forClass(UploaderConfiguration.class);
         verify(configurationServiceMock).createConfiguration(configArg.capture());
 
@@ -68,6 +70,8 @@ public class ConfigureCommandTest {
         Assert.assertEquals(serviceEndPoint, configArg.getValue().getServiceEndpoint());
         Assert.assertEquals(signingRegion, configArg.getValue().getSigningRegion());
         Assert.assertNull(configArg.getValue().getActive());
+
+        verifyNoMoreInteractions(configurationServiceMock);
 
         final String expectedOutput = SequenceBuilder.createSequence(
                 "This command will ask you questions about new configuration",
