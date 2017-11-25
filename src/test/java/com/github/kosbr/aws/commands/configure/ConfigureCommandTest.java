@@ -180,6 +180,61 @@ public class ConfigureCommandTest {
     }
 
     @Test
+    public void testCreateConfigurationWithInvalidNameAttempt() throws InvalidConfigurationException, ConfigurationExistsException {
+
+        final String invalidConfigurationName = "-df f";
+        final String configurationName = "test";
+        final String serviceEndPoint = "endpoint";
+        final String signingRegion = "region";
+
+        when(configurationServiceMock.findByName(configurationName))
+                .thenReturn(Optional.empty());
+
+        final BufferedReader bufferedReader = SequenceBuilder.create()
+                .addLine(invalidConfigurationName)
+                .addLine(configurationName)
+                .addLine(serviceEndPoint)
+                .addLine(signingRegion)
+                .addLine("")
+                .getAsBufferedReader();
+
+        final PrintStreamWrapper printStreamWrapper = new PrintStreamWrapper();
+        final ConfigureOptions options = new ConfigureOptions();
+        configureHandler.handle(options, printStreamWrapper.getPrintStream(), bufferedReader);
+
+        verify(configurationServiceMock).findByName(configurationName);
+
+        final ArgumentCaptor<UploaderConfiguration> configArg = ArgumentCaptor.forClass(UploaderConfiguration.class);
+        verify(configurationServiceMock).createConfiguration(configArg.capture());
+
+        Assert.assertEquals(configurationName, configArg.getValue().getName());
+        Assert.assertEquals(serviceEndPoint, configArg.getValue().getServiceEndpoint());
+        Assert.assertEquals(signingRegion, configArg.getValue().getSigningRegion());
+        Assert.assertNull(configArg.getValue().getActive());
+
+        verifyNoMoreInteractions(configurationServiceMock);
+
+        final String expectedOutput = SequenceBuilder.createSequence(
+                "This command will ask you questions about new configuration",
+                "Print exit if you want to interrupt configuration creating",
+                "Enter the name of the new configuration",
+                "The name must not contain space and dash symbols",
+                "Enter the name of the new configuration",
+                "Enter the service endpoint of the new configuration",
+                "Enter the signing region of the new configuration",
+                "The configuration with following parameters is going to be created",
+                "Name: " + configurationName,
+                "Service endpoint: " + serviceEndPoint,
+                "Signing region: " + signingRegion,
+                "Print exit if there is a mistake and launch the command one more time.",
+                "If everything is ok, press Enter",
+                "The configuration has been saved.",
+                "If you would like to use it, make it active by 'use' command");
+
+        Assert.assertEquals(expectedOutput, printStreamWrapper.getOutContent());
+    }
+
+    @Test
     public void testSuccessCreateConfigurationWithEmptyServiceEndpointAttempt() throws InvalidConfigurationException, ConfigurationExistsException {
 
         final String configurationName = "test";

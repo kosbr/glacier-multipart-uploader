@@ -66,6 +66,10 @@ public class ConfigureHandler implements DialogCommandHandler<ConfigureOptions> 
         if (EXIT.equalsIgnoreCase(wishedName)) {
             throw new InterruptedCommandException();
         }
+        if (wishedName.contains("-") || wishedName.contains(" ")) {
+            printStream.println("The name must not contain space and dash symbols");
+            return getName(bufferedReader, printStream);
+        }
         if (uploaderConfigurationService.findByName(wishedName).isPresent()) {
             printStream.println("The name " + wishedName + " is already used");
             return getName(bufferedReader, printStream);
