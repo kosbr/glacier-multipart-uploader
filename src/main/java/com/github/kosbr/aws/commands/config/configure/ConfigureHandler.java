@@ -98,7 +98,7 @@ public class ConfigureHandler implements DialogCommandHandler<ConfigureOptions> 
                 printStream.println("The value shouldn't be empty. Please, enter not empty value:");
                 return safeReadLine(reader, printStream, false);
             } else {
-                return input;
+                return input.trim();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
