@@ -1,7 +1,5 @@
 package com.github.kosbr.aws;
 
-import com.github.kosbr.aws.client.AWSGlacierClient;
-import com.github.kosbr.aws.client.AWSGlacierClientImpl;
 import com.github.kosbr.aws.commands.config.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.config.list.ConfigListHandler;
 import com.github.kosbr.aws.commands.config.use.ConfigUseHandler;
@@ -29,11 +27,6 @@ public class HandlersConfiguration {
     @Bean
     public ConsoleManager consoleManager() {
         return new ConsoleManager(System.out, System.in, commandRegistry());
-    }
-
-    @Bean
-    public AWSGlacierClient awsGlacierClient() {
-        return new AWSGlacierClientImpl();
     }
 
     @Bean
