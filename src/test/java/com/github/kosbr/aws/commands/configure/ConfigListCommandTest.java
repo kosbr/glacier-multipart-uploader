@@ -12,6 +12,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -19,19 +22,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {HandlersConfiguration.class, MockConfigurationServiceConfiguration.class})
 public class ConfigListCommandTest {
 
-    @Autowired
+    @InjectMocks
     private ConfigListHandler configListHandler;
 
-    @Autowired
+    @Mock
     private UploaderConfigurationService configurationServiceMock;
 
     @Before
     public void prepare() {
-        reset(configurationServiceMock);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test

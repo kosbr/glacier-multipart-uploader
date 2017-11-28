@@ -1,6 +1,5 @@
 package com.github.kosbr.aws.commands.configure;
 
-import com.github.kosbr.aws.HandlersConfiguration;
 import com.github.kosbr.aws.commands.config.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.config.configure.ConfigureOptions;
 import com.github.kosbr.aws.exception.config.ConfigurationExistsException;
@@ -12,32 +11,29 @@ import com.github.kosbr.aws.util.SequenceBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.BufferedReader;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {HandlersConfiguration.class, MockConfigurationServiceConfiguration.class})
 public class ConfigureCommandTest {
 
     private static final String EXIT = "exit";
 
-    @Autowired
+    @InjectMocks
     private ConfigureHandler configureHandler;
 
-    @Autowired
+    @Mock
     private UploaderConfigurationService configurationServiceMock;
 
     @Before
     public void prepare() {
-        reset(configurationServiceMock);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test

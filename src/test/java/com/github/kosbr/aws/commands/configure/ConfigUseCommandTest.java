@@ -1,8 +1,5 @@
 package com.github.kosbr.aws.commands.configure;
 
-import com.beust.jcommander.internal.Lists;
-import com.github.kosbr.aws.HandlersConfiguration;
-import com.github.kosbr.aws.commands.config.list.ConfigListOptions;
 import com.github.kosbr.aws.commands.config.use.ConfigUseHandler;
 import com.github.kosbr.aws.commands.config.use.ConfigUseOptions;
 import com.github.kosbr.aws.exception.config.ConfigurationNotFoundException;
@@ -12,26 +9,23 @@ import com.github.kosbr.aws.util.SequenceBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {HandlersConfiguration.class, MockConfigurationServiceConfiguration.class})
 public class ConfigUseCommandTest {
 
-    @Autowired
+    @InjectMocks
     private ConfigUseHandler configUseHandler;
 
-    @Autowired
+    @Mock
     private UploaderConfigurationService configurationServiceMock;
 
     @Before
     public void prepare() {
-        reset(configurationServiceMock);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
