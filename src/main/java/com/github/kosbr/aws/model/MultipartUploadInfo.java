@@ -5,25 +5,15 @@ package com.github.kosbr.aws.model;
  */
 public class MultipartUploadInfo {
 
-    private final String uploadId;
+    private String uploadId;
 
-    private final int bufferSize;
+    private Integer bufferSize;
 
-    private final AWSArchiveDescription description;
+    private String localPath;
 
-    /**
-     *
-     * @param uploadId AWS upload id.
-     * @param bufferSize The size of the one part in multipart upload.
-     * @param description The description of the current upload.
-     */
-    public MultipartUploadInfo(final String uploadId,
-                               final int bufferSize,
-                               final AWSArchiveDescription description) {
-        this.uploadId = uploadId;
-        this.bufferSize = bufferSize;
-        this.description = description;
-    }
+    private String description;
+
+    private String vaultName;
 
     /**
      * AWS upload id.
@@ -42,10 +32,46 @@ public class MultipartUploadInfo {
     }
 
     /**
-     * The description of the current upload.
+     * Absolute local path of the file to be uploaded.
      * @return
      */
-    public AWSArchiveDescription getDescription() {
+    public String getLocalPath() {
+        return localPath;
+    }
+
+    /**
+     * Archive's description.
+     * @return
+     */
+    public String getDescription() {
         return description;
+    }
+
+    /**
+     * The name of existing vault for uploading.
+     * @return
+     */
+    public String getVaultName() {
+        return vaultName;
+    }
+
+    public void setUploadId(final String uploadId) {
+        this.uploadId = uploadId;
+    }
+
+    public void setBufferSize(final Integer bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    public void setLocalPath(final String localPath) {
+        this.localPath = localPath;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public void setVaultName(final String vaultName) {
+        this.vaultName = vaultName;
     }
 }

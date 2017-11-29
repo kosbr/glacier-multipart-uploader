@@ -1,7 +1,6 @@
 package com.github.kosbr.aws.service;
 
 import com.amazonaws.services.glacier.model.CompleteMultipartUploadResult;
-import com.github.kosbr.aws.model.AWSArchiveDescription;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
 
@@ -19,33 +18,44 @@ public interface AWSClientService {
 
     /**
      * Initiate an upload.
-     * @param description The description of wished upload.
-     * @return The information about this upload, which must be used in next stages.
+     * @param vaultName The name of existing vault for uploading.
+     * @param partSize The size of a part in bytes.
+     * @return AWS upload id.
      * @throws NoActiveConfiguration
      */
-    MultipartUploadInfo initiateMultipartUpload(AWSArchiveDescription description) throws NoActiveConfiguration;
+    String initiateMultipartUpload(String vaultName, int partSize) throws NoActiveConfiguration;
 
     /**
      * Complete multipart upload. It is considered, that all parts have been uploaded.
      * @param uploadId The AWS upload id, that should be given from the {@link MultipartUploadInfo}
-     * @param checksum The checksum of all parts that have been uploaded. (The result of uploadParts method)
-     * @param description The description of wished upload.
+     * @param checksum The checksum of all parts that have been uploaded.
+     * @param localPath The absolute local path to the file.
+     * @param vaultName The name of existing vault for uploading.
      * @return The final result of the upload.
      * @throws NoActiveConfiguration If there is no active configuration. See {@link UploaderConfigurationService}.
      */
     CompleteMultipartUploadResult completeMultiPartUpload(String uploadId, String checksum,
-                                                          AWSArchiveDescription description)
+                                                          String localPath, String vaultName)
             throws NoActiveConfiguration;
 
     /**
      * Uploads the parts of the file one by one in natural order. In case of interruption,
      * it is possible to start upload not from the beginning of the file.
-     * @param uploadInfo The upload info that must be given from the initiation stage.
+     * @param localPath The absolute local path to the file.
+     * @param uploadId AWS upload Id.
+     * @param vaultName The name of existing vault for uploading.
+     * @param partSize The size of a part in bytes.
      * @param startPosition The number of byte the upload will start from.
+     * @param partObserver The observer for registering part uploads.
      * @return The checksum of all parts that have been uploaded during this launching.
      * @throws IOException If there are some problems with file reading.
      * @throws NoActiveConfiguration If there is no active configuration. See {@link UploaderConfigurationService}.
      */
-    String uploadParts(MultipartUploadInfo uploadInfo, long startPosition) throws IOException, NoActiveConfiguration;
+    String uploadParts(String localPath,
+                       String uploadId,
+                       String vaultName,
+                       int partSize,
+                       long startPosition,
+                       UploadPartObserver partObserver) throws IOException, NoActiveConfiguration;
 
 }

@@ -5,8 +5,6 @@ import com.amazonaws.services.glacier.TreeHashGenerator;
 import com.amazonaws.services.glacier.model.*;
 import com.amazonaws.util.BinaryUtils;
 import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
-import com.github.kosbr.aws.model.AWSArchiveDescription;
-import com.github.kosbr.aws.model.MultipartUploadInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,34 +17,31 @@ import java.util.List;
 @Service
 public class AWSClientServiceImpl implements AWSClientService {
 
-    // This example works for part sizes up to 1 GB.
-    private static final Integer PART_SIZE = 1048576;
-
     @Autowired
     private AWSGlacierHolder glacierHolder;
 
     @Override
-    public MultipartUploadInfo initiateMultipartUpload(final AWSArchiveDescription description)
+    public String initiateMultipartUpload(final String vaultName, final int partSize)
             throws NoActiveConfiguration {
         final AmazonGlacier client = glacierHolder.getClient();
         final InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest()
-                .withVaultName(description.getVaultName())
+                .withVaultName(vaultName)
                 // todo use more specific name
                 .withArchiveDescription("my archive " + (new Date()))
-                .withPartSize(PART_SIZE.toString());
+                .withPartSize(Integer.toString(partSize));
 
         final InitiateMultipartUploadResult result = client.initiateMultipartUpload(request);
-        return new MultipartUploadInfo(result.getUploadId(), PART_SIZE, description);
+        return result.getUploadId();
     }
 
     @Override
     public CompleteMultipartUploadResult completeMultiPartUpload(final String uploadId, final String checksum,
-                                                                 final AWSArchiveDescription description)
+                                                                 final String localPath, final String vaultName)
             throws NoActiveConfiguration {
         final AmazonGlacier client = glacierHolder.getClient();
-        final File file = new File(description.getLocalPath());
+        final File file = new File(localPath);
         final CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest()
-                .withVaultName(description.getVaultName())
+                .withVaultName(vaultName)
                 .withUploadId(uploadId)
                 .withChecksum(checksum)
                 .withArchiveSize(String.valueOf(file.length()));
@@ -60,16 +55,21 @@ public class AWSClientServiceImpl implements AWSClientService {
     // method must return the rest checksums that have been calculated while launching.
     // Then, consumer of this service should calculate checksum for all parts and use it in completion stage.
     @Override
-    public String uploadParts(final MultipartUploadInfo uploadInfo, final long startPosition)
+    public String uploadParts(final String localPath,
+                              final String uploadId,
+                              final String vaultName,
+                              final int bufferSize,
+                              final long startPosition,
+                              final UploadPartObserver partObserver)
             throws IOException, NoActiveConfiguration {
         //todo use try with resources
         final AmazonGlacier client = glacierHolder.getClient();
         final int filePosition = 0;
         long currentPosition = startPosition;
-        final byte[] buffer = new byte[uploadInfo.getBufferSize()];
+        final byte[] buffer = new byte[bufferSize];
         final List<byte[]> binaryChecksums = new LinkedList<byte[]>();
 
-        final File file = new File(uploadInfo.getDescription().getLocalPath());
+        final File file = new File(localPath);
         final FileInputStream fileToUpload = new FileInputStream(file);
         fileToUpload.skip(startPosition);
         String contentRange;
@@ -88,20 +88,22 @@ public class AWSClientServiceImpl implements AWSClientService {
 
             //Upload part.
             final UploadMultipartPartRequest partRequest = new UploadMultipartPartRequest()
-                    .withVaultName(uploadInfo.getDescription().getVaultName())
+                    .withVaultName(vaultName)
                     .withBody(new ByteArrayInputStream(bytesRead))
                     .withChecksum(checksum)
                     .withRange(contentRange)
-                    .withUploadId(uploadInfo.getUploadId());
+                    .withUploadId(uploadId);
 
             boolean success = false;
 
             while (!success) {
                 try {
                     final UploadMultipartPartResult partResult = client.uploadMultipartPart(partRequest);
-                    //printStream.println("Part uploaded, checksum: " + partResult.getChecksum());
+                    partObserver.registerPartUpload(currentPosition, currentPosition + read -1 ,
+                            partResult.getChecksum());
                     success = true;
                 } catch (Throwable e) {
+                    // todo max attempts number
                     //printStream.println("error" + e.getMessage());
                 }
             }

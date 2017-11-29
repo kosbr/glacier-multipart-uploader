@@ -1,8 +1,6 @@
 package com.github.kosbr.aws.commands.upload;
 
 import com.amazonaws.services.glacier.model.CompleteMultipartUploadResult;
-import com.github.kosbr.aws.model.AWSArchiveDescription;
-import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
 import com.github.kosbr.aws.service.AWSClientService;
 import com.github.kosbr.cli.CommandHandler;
@@ -12,24 +10,25 @@ import java.io.PrintStream;
 
 public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions> {
 
+    // This example works for part sizes up to 1 GB.
+    private static final Integer PART_SIZE = 1048576;
+
     @Autowired
     private AWSClientService client;
 
     @Override
     public boolean handle(final UploadArchiveOptions options, final PrintStream printStream) {
-        final AWSArchiveDescription description = new AWSArchiveDescription(
-                options.getArchiveLocalPath(),
-                options.getVault(),
-                options.getDescription()
-        );
-
         try {
-            final MultipartUploadInfo uploadInfo = client.initiateMultipartUpload(description);
-            final String checksum = client.uploadParts(uploadInfo, 0);
+            final String uploadId = client.initiateMultipartUpload(options.getVault(), PART_SIZE);
+            final String checksum = client.uploadParts(options.getArchiveLocalPath(), uploadId,
+                    options.getVault(), PART_SIZE, 0, (beginByte, endByte, checkSum) -> {
+                        printStream.println("Part uploaded");
+                    });
+
             final CompleteMultipartUploadResult result = client.completeMultiPartUpload(
-                    uploadInfo.getUploadId(), checksum, description
+                    uploadId, checksum, options.getArchiveLocalPath(), options.getVault()
             );
-            // todo show some info
+            printStream.println("Uploaded has been finished. Checksum: " + result.getChecksum());
         } catch (NoActiveConfiguration e) {
             printStream.println("There is no active configuration");
         } catch (Throwable e) {
