@@ -24,6 +24,13 @@ public class UploadRegistrationServiceImpl implements UploadRegistrationService 
     private MultipartUploadInfoRepository multipartUploadInfoRepository;
 
     @Override
+    public List<MultipartUploadInfo> getAllNotFinishedUploads() {
+        final List<MultipartUploadInfo> uploadInfoList = new ArrayList<>();
+        multipartUploadInfoRepository.findAll().forEach(uploadInfoList::add);
+        return uploadInfoList;
+    }
+
+    @Override
     public MultipartUploadInfo registerUpload(final MultipartUploadInfo multipartUploadInfo) {
         return multipartUploadInfoRepository.save(multipartUploadInfo);
     }

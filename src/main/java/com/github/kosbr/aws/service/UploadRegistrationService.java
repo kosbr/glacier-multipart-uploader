@@ -3,7 +3,16 @@ package com.github.kosbr.aws.service;
 import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
 
+import java.util.List;
+
 public interface UploadRegistrationService {
+
+
+    /**
+     * Returns all not finished uploads.
+     * @return List of unfinished uploads.
+     */
+    List<MultipartUploadInfo> getAllNotFinishedUploads();
 
     /**
      * Registration of the upload process. It should be called after successful AWS API request for the
