@@ -6,6 +6,7 @@ import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.service.AWSClientService;
 import com.github.kosbr.aws.service.UploadRegistrationService;
+import com.github.kosbr.aws.service.UploaderConfigurationService;
 import com.github.kosbr.cli.CommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,6 +23,9 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
     @Autowired
     private UploadRegistrationService registrationService;
 
+    @Autowired
+    private UploaderConfigurationService configurationService;
+
     @Override
     public boolean handle(final UploadArchiveOptions options, final PrintStream printStream) {
         try {
@@ -33,7 +37,7 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
             uploadInfo.setLocalPath(options.getArchiveLocalPath());
             uploadInfo.setVaultName(options.getVault());
             uploadInfo.setUploadId(uploadId);
-
+            uploadInfo.setUploaderConfiguration(configurationService.findActiveConfiguration());
             registrationService.registerUpload(uploadInfo);
 
 

@@ -28,6 +28,10 @@ public class MultipartUploadInfo {
     @Column
     private String vaultName;
 
+    @ManyToOne
+    @JoinColumn(name = "CONFIG_NAME")
+    private UploaderConfiguration uploaderConfiguration;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FinishedUpload> finishedUploads;
 
@@ -61,6 +65,10 @@ public class MultipartUploadInfo {
      */
     public String getDescription() {
         return description;
+    }
+
+    public UploaderConfiguration getUploaderConfiguration() {
+        return uploaderConfiguration;
     }
 
     /**
@@ -104,5 +112,9 @@ public class MultipartUploadInfo {
 
     public void setFinishedUploads(final List<FinishedUpload> finishedUploads) {
         this.finishedUploads = finishedUploads;
+    }
+
+    public void setUploaderConfiguration(final UploaderConfiguration uploaderConfiguration) {
+        this.uploaderConfiguration = uploaderConfiguration;
     }
 }
