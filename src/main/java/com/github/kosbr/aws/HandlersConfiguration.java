@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@SuppressWarnings("checkstyle:classdataabstractioncoupling")
 public class HandlersConfiguration {
 
     @Bean

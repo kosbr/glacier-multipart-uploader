@@ -30,14 +30,14 @@ public class ListUploadsHandler implements CommandHandler<ListUploadsOptions> {
         return true;
     }
 
-    private int calculateProgress(MultipartUploadInfo upload) {
+    private int calculateProgress(final MultipartUploadInfo upload) {
         try {
-            long currentPosition = registrationService.getCurrentUploadPosition(upload.getId());
+            final long currentPosition = registrationService.getCurrentUploadPosition(upload.getId());
             if (currentPosition == 0) {
                 return 0;
             }
             final File file = new File(upload.getLocalPath());
-            return (int) (HUNDRED * ((double) (currentPosition) / file.length()));
+            return (int) (HUNDRED * ((double) currentPosition / file.length()));
         } catch (UploadNotFoundException e) {
             throw new RuntimeException("Impossible to find " + upload.getId() + " upload");
         }
