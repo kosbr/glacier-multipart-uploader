@@ -1,19 +1,35 @@
 package com.github.kosbr.aws.model;
 
+import javax.persistence.*;
+import java.util.List;
+
 /**
  * Keeps information about the upload process that has been already started.
  */
+@Entity
 public class MultipartUploadInfo {
 
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column
     private String uploadId;
 
+    @Column
     private Integer bufferSize;
 
+    @Column
     private String localPath;
 
+    @Column
     private String description;
 
+    @Column
     private String vaultName;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FinishedUpload> finishedUploads;
 
     /**
      * AWS upload id.
@@ -55,6 +71,17 @@ public class MultipartUploadInfo {
         return vaultName;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @return List of the part uploads that already have been performed.
+     */
+    public List<FinishedUpload> getFinishedUploads() {
+        return finishedUploads;
+    }
+
     public void setUploadId(final String uploadId) {
         this.uploadId = uploadId;
     }
@@ -73,5 +100,9 @@ public class MultipartUploadInfo {
 
     public void setVaultName(final String vaultName) {
         this.vaultName = vaultName;
+    }
+
+    public void setFinishedUploads(final List<FinishedUpload> finishedUploads) {
+        this.finishedUploads = finishedUploads;
     }
 }

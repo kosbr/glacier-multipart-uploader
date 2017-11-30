@@ -10,6 +10,7 @@ public interface UploadPartObserver {
      * @param beginByte The start position of uploaded part in the file.
      * @param endByte The end position of uploaded part in the file.
      * @param checkSum The checksum of the uploaded part.
+     * @param progressInPercents Current progress in percents.
      */
-    void registerPartUpload(long beginByte, long endByte, String checkSum);
+    void registerPartUpload(long beginByte, long endByte, String checkSum, int progressInPercents);
 }

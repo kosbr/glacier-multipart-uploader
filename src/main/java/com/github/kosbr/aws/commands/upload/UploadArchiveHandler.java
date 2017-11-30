@@ -2,7 +2,10 @@ package com.github.kosbr.aws.commands.upload;
 
 import com.amazonaws.services.glacier.model.CompleteMultipartUploadResult;
 import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
+import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
+import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.service.AWSClientService;
+import com.github.kosbr.aws.service.UploadRegistrationService;
 import com.github.kosbr.cli.CommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,17 +19,39 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
     @Autowired
     private AWSClientService client;
 
+    @Autowired
+    private UploadRegistrationService registrationService;
+
     @Override
     public boolean handle(final UploadArchiveOptions options, final PrintStream printStream) {
         try {
             final String uploadId = client.initiateMultipartUpload(options.getVault(), PART_SIZE);
-            final String checksum = client.uploadParts(options.getArchiveLocalPath(), uploadId,
-                    options.getVault(), PART_SIZE, 0, (beginByte, endByte, checkSum) -> {
-                        printStream.println("Part uploaded");
+
+            final MultipartUploadInfo uploadInfo = new MultipartUploadInfo();
+            uploadInfo.setBufferSize(PART_SIZE);
+            uploadInfo.setDescription(options.getDescription());
+            uploadInfo.setLocalPath(options.getArchiveLocalPath());
+            uploadInfo.setVaultName(options.getVault());
+            uploadInfo.setUploadId(uploadId);
+
+            registrationService.registerUpload(uploadInfo);
+
+
+            client.uploadParts(options.getArchiveLocalPath(), uploadId,
+                    options.getVault(), PART_SIZE, 0, (beginByte, endByte, checkSum, progressInPercents) -> {
+                        try {
+                            registrationService.registerPartUpload(uploadInfo.getId(), beginByte, endByte, checkSum);
+                            printStream.println("Part uploaded: " + beginByte + "-" +  endByte);
+                            printStream.println("Checksum: " + checkSum);
+                            printStream.println("Progress: " + progressInPercents + " %");
+                        } catch (UploadNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
                     });
 
+            final String checksum = registrationService.registerAllPartsUploaded(uploadInfo.getId());
             final CompleteMultipartUploadResult result = client.completeMultiPartUpload(
-                    uploadId, checksum, options.getArchiveLocalPath(), options.getVault()
+            uploadId, checksum, uploadInfo.getLocalPath(), uploadInfo.getVaultName()
             );
             printStream.println("Uploaded has been finished. Checksum: " + result.getChecksum());
         } catch (NoActiveConfiguration e) {
