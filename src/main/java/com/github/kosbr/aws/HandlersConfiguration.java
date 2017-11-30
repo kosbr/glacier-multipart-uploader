@@ -5,6 +5,7 @@ import com.github.kosbr.aws.commands.config.list.ConfigListHandler;
 import com.github.kosbr.aws.commands.config.use.ConfigUseHandler;
 import com.github.kosbr.aws.commands.exit.ExitHandler;
 import com.github.kosbr.aws.commands.upload.UploadArchiveHandler;
+import com.github.kosbr.aws.commands.uploads.ListUploadsHandler;
 import com.github.kosbr.cli.ConsoleManager;
 import com.github.kosbr.cli.registry.CommandRegistry;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ public class HandlersConfiguration {
         commandRegistry.registerCommand("config-list", configListHandler());
         commandRegistry.registerCommand("config-use", configUseHandler());
         commandRegistry.registerCommand("upload", uploadArchiveHandler());
+        commandRegistry.registerCommand("uploads-list", listUploadsHandler());
         return commandRegistry;
     }
 
@@ -53,6 +55,11 @@ public class HandlersConfiguration {
     @Bean
     public UploadArchiveHandler uploadArchiveHandler() {
         return new UploadArchiveHandler();
+    }
+
+    @Bean
+    public ListUploadsHandler listUploadsHandler() {
+        return new ListUploadsHandler();
     }
 
 
