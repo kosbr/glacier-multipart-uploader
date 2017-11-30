@@ -19,6 +19,8 @@ public class AWSClientServiceImpl implements AWSClientService {
 
     private static final int HUNDRED = 100;
 
+    private static final int MAX_UPLOAD_PART_ATTEMPTS_NUMBER = 20;
+
     @Autowired
     private AWSGlacierHolder glacierHolder;
 
@@ -95,7 +97,9 @@ public class AWSClientServiceImpl implements AWSClientService {
 
                 boolean success = false;
 
-                while (!success) {
+                int attemptsNumber = MAX_UPLOAD_PART_ATTEMPTS_NUMBER;
+
+                while (!success && attemptsNumber > 0) {
                     try {
                         final UploadMultipartPartResult partResult = client.uploadMultipartPart(partRequest);
                         final int progressInPercents =
@@ -104,8 +108,7 @@ public class AWSClientServiceImpl implements AWSClientService {
                                 partResult.getChecksum(), progressInPercents);
                         success = true;
                     } catch (Throwable e) {
-                        // todo max attempts number
-                        //printStream.println("error" + e.getMessage());
+                        attemptsNumber--;
                     }
                 }
                 currentPosition = currentPosition + read;
