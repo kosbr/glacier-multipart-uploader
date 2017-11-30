@@ -51,11 +51,6 @@ public class AWSClientServiceImpl implements AWSClientService {
         return client.completeMultipartUpload(compRequest);
     }
 
-
-    // todo actually it won't work with not zero startPosition.
-    // It is needed to add storing of checksum for every uploaded part and this
-    // method must return the rest checksums that have been calculated while launching.
-    // Then, consumer of this service should calculate checksum for all parts and use it in completion stage.
     @Override
     public String uploadParts(final String localPath,
                               final String uploadId,
@@ -63,8 +58,7 @@ public class AWSClientServiceImpl implements AWSClientService {
                               final int bufferSize,
                               final long startPosition,
                               final UploadPartObserver partObserver)
-            throws IOException, NoActiveConfiguration {
-        //todo use try with resources
+            throws NoActiveConfiguration, IOException {
         final AmazonGlacier client = glacierHolder.getClient();
         final int filePosition = 0;
         long currentPosition = startPosition;
@@ -72,48 +66,51 @@ public class AWSClientServiceImpl implements AWSClientService {
         final List<byte[]> binaryChecksums = new LinkedList<byte[]>();
 
         final File file = new File(localPath);
-        final FileInputStream fileToUpload = new FileInputStream(file);
-        fileToUpload.skip(startPosition);
-        String contentRange;
-        int read;
-        while (currentPosition < file.length()) {
-            read = fileToUpload.read(buffer, filePosition, buffer.length);
-            if (read == -1) {
-                break;
+        try (final FileInputStream fileToUpload = new FileInputStream(file)) {
+            final long skipped = fileToUpload.skip(startPosition);
+            if (skipped != startPosition) {
+                throw new UnsupportedOperationException("Impossible to skip " + startPosition + " bytes");
             }
-            final byte[] bytesRead = Arrays.copyOf(buffer, read);
-
-            contentRange = String.format("bytes %s-%s/*", currentPosition, currentPosition + read - 1);
-            final String checksum = TreeHashGenerator.calculateTreeHash(new ByteArrayInputStream(bytesRead));
-            final byte[] binaryChecksum = BinaryUtils.fromHex(checksum);
-            binaryChecksums.add(binaryChecksum);
-
-            //Upload part.
-            final UploadMultipartPartRequest partRequest = new UploadMultipartPartRequest()
-                    .withVaultName(vaultName)
-                    .withBody(new ByteArrayInputStream(bytesRead))
-                    .withChecksum(checksum)
-                    .withRange(contentRange)
-                    .withUploadId(uploadId);
-
-            boolean success = false;
-
-            while (!success) {
-                try {
-                    final UploadMultipartPartResult partResult = client.uploadMultipartPart(partRequest);
-                    final int progressInPercents =
-                            (int) (HUNDRED * ((double) (currentPosition + read - 1) / file.length()));
-                    partObserver.registerPartUpload(currentPosition, currentPosition + read - 1,
-                            partResult.getChecksum(), progressInPercents);
-                    success = true;
-                } catch (Throwable e) {
-                    // todo max attempts number
-                    //printStream.println("error" + e.getMessage());
+            String contentRange;
+            int read;
+            while (currentPosition < file.length()) {
+                read = fileToUpload.read(buffer, filePosition, buffer.length);
+                if (read == -1) {
+                    break;
                 }
+                final byte[] bytesRead = Arrays.copyOf(buffer, read);
+
+                contentRange = String.format("bytes %s-%s/*", currentPosition, currentPosition + read - 1);
+                final String checksum = TreeHashGenerator.calculateTreeHash(new ByteArrayInputStream(bytesRead));
+                final byte[] binaryChecksum = BinaryUtils.fromHex(checksum);
+                binaryChecksums.add(binaryChecksum);
+
+                //Upload part.
+                final UploadMultipartPartRequest partRequest = new UploadMultipartPartRequest()
+                        .withVaultName(vaultName)
+                        .withBody(new ByteArrayInputStream(bytesRead))
+                        .withChecksum(checksum)
+                        .withRange(contentRange)
+                        .withUploadId(uploadId);
+
+                boolean success = false;
+
+                while (!success) {
+                    try {
+                        final UploadMultipartPartResult partResult = client.uploadMultipartPart(partRequest);
+                        final int progressInPercents =
+                                (int) (HUNDRED * ((double) (currentPosition + read - 1) / file.length()));
+                        partObserver.registerPartUpload(currentPosition, currentPosition + read - 1,
+                                partResult.getChecksum(), progressInPercents);
+                        success = true;
+                    } catch (Throwable e) {
+                        // todo max attempts number
+                        //printStream.println("error" + e.getMessage());
+                    }
+                }
+                currentPosition = currentPosition + read;
             }
-            currentPosition = currentPosition + read;
         }
-        fileToUpload.close();
         return TreeHashGenerator.calculateTreeHash(binaryChecksums);
     }
 
