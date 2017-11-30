@@ -92,7 +92,7 @@ public class UploadRegistrationServiceImpl implements UploadRegistrationService 
                 .getEnd() + 1;
     }
 
-    private void throwNotFoundException(long uploadInfoId) throws UploadNotFoundException {
+    private void throwNotFoundException(final long uploadInfoId) throws UploadNotFoundException {
         throw new UploadNotFoundException("Upload with id " + uploadInfoId + " was not found");
     }
 }

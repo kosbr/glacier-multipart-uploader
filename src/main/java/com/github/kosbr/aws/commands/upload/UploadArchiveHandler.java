@@ -37,21 +37,21 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
             registrationService.registerUpload(uploadInfo);
 
 
-            client.uploadParts(options.getArchiveLocalPath(), uploadId,
-                    options.getVault(), PART_SIZE, 0, (beginByte, endByte, checkSum, progressInPercents) -> {
-                        try {
-                            registrationService.registerPartUpload(uploadInfo.getId(), beginByte, endByte, checkSum);
-                            printStream.println("Part uploaded: " + beginByte + "-" +  endByte);
-                            printStream.println("Checksum: " + checkSum);
-                            printStream.println("Progress: " + progressInPercents + " %");
-                        } catch (UploadNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+            client.uploadParts(options.getArchiveLocalPath(), uploadId, options.getVault(), PART_SIZE, 0,
+                (beginByte, endByte, checkSum, progressInPercents) -> {
+                    try {
+                        registrationService.registerPartUpload(uploadInfo.getId(), beginByte, endByte, checkSum);
+                        printStream.println("Part uploaded: " + beginByte + "-" + endByte);
+                        printStream.println("Checksum: " + checkSum);
+                        printStream.println("Progress: " + progressInPercents + " %");
+                    } catch (UploadNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
             final String checksum = registrationService.registerAllPartsUploaded(uploadInfo.getId());
             final CompleteMultipartUploadResult result = client.completeMultiPartUpload(
-            uploadId, checksum, uploadInfo.getLocalPath(), uploadInfo.getVaultName()
+                    uploadId, checksum, uploadInfo.getLocalPath(), uploadInfo.getVaultName()
             );
             printStream.println("Uploaded has been finished. Checksum: " + result.getChecksum());
         } catch (NoActiveConfiguration e) {

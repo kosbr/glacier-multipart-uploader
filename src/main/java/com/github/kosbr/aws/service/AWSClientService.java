@@ -1,7 +1,6 @@
 package com.github.kosbr.aws.service;
 
 import com.amazonaws.services.glacier.model.CompleteMultipartUploadResult;
-import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ public interface AWSClientService {
 
     /**
      * Complete multipart upload. It is considered, that all parts have been uploaded.
-     * @param uploadId The AWS upload id, that should be given from the {@link MultipartUploadInfo}
+     * @param uploadId The AWS upload id, that should be given from the MultipartUploadInfo
      * @param checksum The checksum of all parts that have been uploaded.
      * @param localPath The absolute local path to the file.
      * @param vaultName The name of existing vault for uploading.

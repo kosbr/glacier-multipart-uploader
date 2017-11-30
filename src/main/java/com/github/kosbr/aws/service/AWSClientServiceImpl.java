@@ -17,6 +17,8 @@ import java.util.List;
 @Service
 public class AWSClientServiceImpl implements AWSClientService {
 
+    private static final int HUNDRED = 100;
+
     @Autowired
     private AWSGlacierHolder glacierHolder;
 
@@ -99,8 +101,9 @@ public class AWSClientServiceImpl implements AWSClientService {
             while (!success) {
                 try {
                     final UploadMultipartPartResult partResult = client.uploadMultipartPart(partRequest);
-                    int progressInPercents = (int)(100 * ((double)(currentPosition + read - 1) / file.length()));
-                    partObserver.registerPartUpload(currentPosition, currentPosition + read -1 ,
+                    final int progressInPercents =
+                            (int) (HUNDRED * ((double) (currentPosition + read - 1) / file.length()));
+                    partObserver.registerPartUpload(currentPosition, currentPosition + read - 1,
                             partResult.getChecksum(), progressInPercents);
                     success = true;
                 } catch (Throwable e) {

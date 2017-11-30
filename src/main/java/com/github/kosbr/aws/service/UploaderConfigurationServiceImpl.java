@@ -47,7 +47,7 @@ public class UploaderConfigurationServiceImpl implements UploaderConfigurationSe
     public void deleteConfiguration(final String name) throws ConfigurationNotFoundException {
         final Optional<UploaderConfiguration> configuration = configurationRepository.findById(name);
         if (!configuration.isPresent()) {
-            throw new ConfigurationNotFoundException("Configuration with name " + name + " is not found");
+            throwConfigurationNotFoundException(name);
         }
         configurationRepository.delete(configuration.get());
     }
@@ -70,7 +70,8 @@ public class UploaderConfigurationServiceImpl implements UploaderConfigurationSe
     public void makeConfigurationActive(final String name) throws ConfigurationNotFoundException {
         final Optional<UploaderConfiguration> maybeConfig = configurationRepository.findById(name);
         if (!maybeConfig.isPresent()) {
-            throw new ConfigurationNotFoundException("Configuration with name " + name + " is not found");
+            throwConfigurationNotFoundException(name);
+            return;
         }
         configurationRepository.findAll().forEach(config -> {
             config.setActive(false);
@@ -96,5 +97,9 @@ public class UploaderConfigurationServiceImpl implements UploaderConfigurationSe
         if (StringUtils.isEmpty(config.getSigningRegion())) {
             throw new InvalidConfigurationException("Signing region is null or empty");
         }
+    }
+
+    private void throwConfigurationNotFoundException(final String name) throws ConfigurationNotFoundException {
+        throw new ConfigurationNotFoundException("Configuration with name " + name + " is not found");
     }
 }
