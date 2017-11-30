@@ -18,8 +18,8 @@ public class HandlersConfiguration {
         final CommandRegistry commandRegistry = new CommandRegistry();
         commandRegistry.registerCommand("exit", exitHandler());
         commandRegistry.registerCommand("configure", configureHandler());
-        commandRegistry.registerCommand("configlist", configListHandler());
-        commandRegistry.registerCommand("configuse", configUseHandler());
+        commandRegistry.registerCommand("config-list", configListHandler());
+        commandRegistry.registerCommand("config-use", configUseHandler());
         commandRegistry.registerCommand("upload", uploadArchiveHandler());
         return commandRegistry;
     }
