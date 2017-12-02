@@ -2,6 +2,7 @@ package com.github.kosbr.aws.service;
 
 import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
+import com.github.kosbr.aws.model.UploaderConfiguration;
 
 import java.util.List;
 
@@ -45,6 +46,12 @@ public interface UploadRegistrationService {
     void removeUploadInfo(long uploadInfoId) throws UploadNotFoundException;
 
     /**
+     * Removes all uploadInfos.
+     * @param multipartUploadInfos
+     */
+    void removeUploadInfos(List<MultipartUploadInfo> multipartUploadInfos);
+
+    /**
      * Returns the byte position, the following upload should start with.
      * @param uploadInfoId The id of corresponding {@link MultipartUploadInfo} that was given in registerUpload method.
      * @return The byte position, the following upload should start with.
@@ -58,5 +65,13 @@ public interface UploadRegistrationService {
      * @throws UploadNotFoundException
      */
     MultipartUploadInfo findUploadInfo(long uploadInfoId) throws UploadNotFoundException;
+
+
+    /**
+     * Find uploads by configuration.
+     * @param configuration
+     * @return
+     */
+    List<MultipartUploadInfo> findByConfiguration(UploaderConfiguration configuration);
 
 }

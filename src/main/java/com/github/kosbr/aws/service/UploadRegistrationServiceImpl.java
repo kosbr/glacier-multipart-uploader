@@ -5,6 +5,7 @@ import com.amazonaws.util.BinaryUtils;
 import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
 import com.github.kosbr.aws.model.FinishedUpload;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
+import com.github.kosbr.aws.model.UploaderConfiguration;
 import com.github.kosbr.aws.repository.MultipartUploadInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,11 @@ public class UploadRegistrationServiceImpl implements UploadRegistrationService 
     }
 
     @Override
+    public void removeUploadInfos(final List<MultipartUploadInfo> multipartUploadInfos) {
+        multipartUploadInfoRepository.deleteAll(multipartUploadInfos);
+    }
+
+    @Override
     public long getCurrentUploadPosition(final long uploadInfoId) throws UploadNotFoundException {
         final Optional<MultipartUploadInfo> maybeUploadInfo = multipartUploadInfoRepository.findById(uploadInfoId);
         if (!maybeUploadInfo.isPresent()) {
@@ -106,6 +112,11 @@ public class UploadRegistrationServiceImpl implements UploadRegistrationService 
             throwNotFoundException(uploadInfoId);
         }
         return maybeUploadInfo.get();
+    }
+
+    @Override
+    public List<MultipartUploadInfo> findByConfiguration(final UploaderConfiguration configuration) {
+        return multipartUploadInfoRepository.findAllByUploaderConfiguration(configuration);
     }
 
     private void throwNotFoundException(final long uploadInfoId) throws UploadNotFoundException {
