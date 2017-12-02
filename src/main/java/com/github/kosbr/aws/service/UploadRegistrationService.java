@@ -51,4 +51,12 @@ public interface UploadRegistrationService {
      */
     long getCurrentUploadPosition(long uploadInfoId) throws UploadNotFoundException;
 
+    /**
+     * Find UploadInfo by Id.
+     * @param uploadInfoId
+     * @return UploadInfo or throw exception if it is not found.
+     * @throws UploadNotFoundException
+     */
+    MultipartUploadInfo findUploadInfo(long uploadInfoId) throws UploadNotFoundException;
+
 }

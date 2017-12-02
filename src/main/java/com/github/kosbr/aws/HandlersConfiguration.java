@@ -4,6 +4,7 @@ import com.github.kosbr.aws.commands.config.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.config.list.ConfigListHandler;
 import com.github.kosbr.aws.commands.config.use.ConfigUseHandler;
 import com.github.kosbr.aws.commands.exit.ExitHandler;
+import com.github.kosbr.aws.commands.proceed.ProceedCommandHandler;
 import com.github.kosbr.aws.commands.upload.UploadArchiveHandler;
 import com.github.kosbr.aws.commands.uploads.ListUploadsHandler;
 import com.github.kosbr.cli.ConsoleManager;
@@ -24,6 +25,7 @@ public class HandlersConfiguration {
         commandRegistry.registerCommand("config-use", configUseHandler());
         commandRegistry.registerCommand("upload", uploadArchiveHandler());
         commandRegistry.registerCommand("uploads-list", listUploadsHandler());
+        commandRegistry.registerCommand("upload-proceed", proceedCommandHandler());
         return commandRegistry;
     }
 
@@ -56,6 +58,11 @@ public class HandlersConfiguration {
     @Bean
     public UploadArchiveHandler uploadArchiveHandler() {
         return new UploadArchiveHandler();
+    }
+
+    @Bean
+    public ProceedCommandHandler proceedCommandHandler() {
+        return new ProceedCommandHandler();
     }
 
     @Bean

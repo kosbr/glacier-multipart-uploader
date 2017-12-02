@@ -99,6 +99,15 @@ public class UploadRegistrationServiceImpl implements UploadRegistrationService 
                 .getEnd() + 1;
     }
 
+    @Override
+    public MultipartUploadInfo findUploadInfo(final long uploadInfoId) throws UploadNotFoundException {
+        final Optional<MultipartUploadInfo> maybeUploadInfo = multipartUploadInfoRepository.findById(uploadInfoId);
+        if (!maybeUploadInfo.isPresent()) {
+            throwNotFoundException(uploadInfoId);
+        }
+        return maybeUploadInfo.get();
+    }
+
     private void throwNotFoundException(final long uploadInfoId) throws UploadNotFoundException {
         throw new UploadNotFoundException("Upload with id " + uploadInfoId + " was not found");
     }
