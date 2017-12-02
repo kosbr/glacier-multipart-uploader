@@ -1,1 +1,17 @@
 language: java
+stages:
+  - build
+  - deploy
+jobs:
+  include:
+    - stage: build
+      script: mvn install
+    - stage: deploy
+      script: mvn install
+      deploy:
+        provider: releases
+        api_key: $GITHUB_TOKEN
+        skip_cleanup: true
+        file: gmu-cli/target/aws-uploader.jar
+        on:
+          tags: true
