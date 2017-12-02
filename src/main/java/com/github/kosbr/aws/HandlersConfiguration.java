@@ -2,6 +2,7 @@ package com.github.kosbr.aws;
 
 import com.github.kosbr.aws.commands.config.configure.ConfigureHandler;
 import com.github.kosbr.aws.commands.config.delete.DeleteConfigurationCommandHandler;
+import com.github.kosbr.aws.commands.config.deleteall.DeleteAllCommandHandler;
 import com.github.kosbr.aws.commands.config.list.ConfigListHandler;
 import com.github.kosbr.aws.commands.config.use.ConfigUseHandler;
 import com.github.kosbr.aws.commands.exit.ExitHandler;
@@ -28,6 +29,7 @@ public class HandlersConfiguration {
         commandRegistry.registerCommand("uploads-list", listUploadsHandler());
         commandRegistry.registerCommand("upload-proceed", proceedCommandHandler());
         commandRegistry.registerCommand("config-delete", deleteConfigurationCommandHandler());
+        commandRegistry.registerCommand("config-reset", deleteAllCommandHandler());
         return commandRegistry;
     }
 
@@ -75,6 +77,11 @@ public class HandlersConfiguration {
     @Bean
     public DeleteConfigurationCommandHandler deleteConfigurationCommandHandler() {
         return new DeleteConfigurationCommandHandler();
+    }
+
+    @Bean
+    public DeleteAllCommandHandler deleteAllCommandHandler() {
+        return new DeleteAllCommandHandler();
     }
 
 
