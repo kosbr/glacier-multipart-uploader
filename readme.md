@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.org/kosbr/glacier-multipart-uploader.svg?branch=master)](https://travis-ci.org/kosbr/glacier-multipart-uploader)
