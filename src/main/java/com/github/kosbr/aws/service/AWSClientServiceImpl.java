@@ -103,7 +103,7 @@ public class AWSClientServiceImpl implements AWSClientService {
                     try {
                         final UploadMultipartPartResult partResult = client.uploadMultipartPart(partRequest);
                         final int progressInPercents =
-                                (int) (HUNDRED * ((double) (currentPosition + read - 1) / file.length()));
+                                (int) (HUNDRED * ((double) (currentPosition + read) / file.length()));
                         partObserver.registerPartUpload(currentPosition, currentPosition + read - 1,
                                 partResult.getChecksum(), progressInPercents);
                         success = true;
