@@ -36,7 +36,7 @@ public class ProceedCommandHandler implements CommandHandler<ProceedCommandOptio
 
             final File file = new File(uploadInfo.getLocalPath());
 
-            if (startPosition - 1 < file.length()) {
+            if (startPosition < file.length()) {
                 client.uploadParts(uploadInfo.getLocalPath(), uploadInfo.getUploadId(), uploadInfo.getVaultName(),
                         uploadInfo.getBufferSize(), startPosition,
                     (beginByte, endByte, checkSum, progressInPercents) -> {
