@@ -11,6 +11,10 @@
 
     <artifactId>gmu-cli</artifactId>
 
+    <properties>
+        <assembly-plugin.version>2.6</assembly-plugin.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.kosbr</groupId>
@@ -56,6 +60,37 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>${assembly-plugin.version}</version>
+                <configuration>
+                    <finalName>aws-uploader</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.github.kosbr.aws.app.GlacierUploaderApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>
