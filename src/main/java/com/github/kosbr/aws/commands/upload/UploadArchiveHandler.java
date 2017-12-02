@@ -58,6 +58,7 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
                     uploadId, checksum, uploadInfo.getLocalPath(), uploadInfo.getVaultName()
             );
             printStream.println("Uploaded has been finished. Checksum: " + result.getChecksum());
+            registrationService.removeUploadInfo(uploadInfo.getId());
         } catch (NoActiveConfiguration e) {
             printStream.println("There is no active configuration");
         } catch (Throwable e) {
