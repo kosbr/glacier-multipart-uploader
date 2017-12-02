@@ -2,9 +2,11 @@ package com.github.kosbr.aws.commands.proceed;
 
 import com.amazonaws.services.glacier.model.CompleteMultipartUploadResult;
 import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
+import com.github.kosbr.aws.exception.registration.FileChangedException;
 import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.service.AWSClientService;
+import com.github.kosbr.aws.service.FileDigestService;
 import com.github.kosbr.aws.service.UploadRegistrationService;
 import com.github.kosbr.aws.service.UploaderConfigurationService;
 import com.github.kosbr.cli.CommandHandler;
@@ -24,11 +26,21 @@ public class ProceedCommandHandler implements CommandHandler<ProceedCommandOptio
     @Autowired
     private UploaderConfigurationService configurationService;
 
+    @Autowired
+    private FileDigestService fileDigestService;
+
     @Override
     public boolean handle(final ProceedCommandOptions options, final PrintStream printStream) {
 
         try {
             final MultipartUploadInfo uploadInfo = registrationService.findUploadInfo(options.getUploadId());
+
+            final String actualDigest = fileDigestService.calculateSha256Hex(uploadInfo.getLocalPath());
+
+            if (!actualDigest.equals(uploadInfo.getDigest())) {
+                throw new FileChangedException("The file " + uploadInfo.getLocalPath() + " has been changed.");
+            }
+
             final long startPosition = registrationService.getCurrentUploadPosition(uploadInfo.getId());
 
             printStream.println("Make configuration " + uploadInfo.getUploaderConfiguration().getName() + " active");

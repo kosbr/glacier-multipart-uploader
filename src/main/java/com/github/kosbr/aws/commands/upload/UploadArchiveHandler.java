@@ -5,6 +5,7 @@ import com.github.kosbr.aws.exception.config.NoActiveConfiguration;
 import com.github.kosbr.aws.exception.registration.UploadNotFoundException;
 import com.github.kosbr.aws.model.MultipartUploadInfo;
 import com.github.kosbr.aws.service.AWSClientService;
+import com.github.kosbr.aws.service.FileDigestService;
 import com.github.kosbr.aws.service.UploadRegistrationService;
 import com.github.kosbr.aws.service.UploaderConfigurationService;
 import com.github.kosbr.cli.CommandHandler;
@@ -26,9 +27,14 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
     @Autowired
     private UploaderConfigurationService configurationService;
 
+    @Autowired
+    private FileDigestService fileDigestService;
+
     @Override
     public boolean handle(final UploadArchiveOptions options, final PrintStream printStream) {
         try {
+
+            final String digest = fileDigestService.calculateSha256Hex(options.getArchiveLocalPath());
             final String uploadId = client.initiateMultipartUpload(options.getVault(), PART_SIZE);
 
             final MultipartUploadInfo uploadInfo = new MultipartUploadInfo();
@@ -37,9 +43,9 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
             uploadInfo.setLocalPath(options.getArchiveLocalPath());
             uploadInfo.setVaultName(options.getVault());
             uploadInfo.setUploadId(uploadId);
+            uploadInfo.setDigest(digest);
             uploadInfo.setUploaderConfiguration(configurationService.findActiveConfiguration());
             registrationService.registerUpload(uploadInfo);
-
 
             client.uploadParts(options.getArchiveLocalPath(), uploadId, options.getVault(), PART_SIZE, 0,
                 (beginByte, endByte, checkSum, progressInPercents) -> {

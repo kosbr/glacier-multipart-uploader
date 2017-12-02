@@ -22,6 +22,7 @@
         <h2.version>1.4.196</h2.version>
         <hibernate.version>5.2.12.Final</hibernate.version>
         <spring-data.version>2.0.1.RELEASE</spring-data.version>
+        <commons-codec.version>1.11</commons-codec.version>
 
         <logback.version>1.2.3</logback.version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -88,6 +89,13 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons-codec.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.slf4j</groupId>

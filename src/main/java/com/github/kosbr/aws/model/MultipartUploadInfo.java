@@ -28,6 +28,9 @@ public class MultipartUploadInfo {
     @Column
     private String vaultName;
 
+    @Column
+    private String digest;
+
     @ManyToOne
     @JoinColumn(name = "CONFIG_NAME")
     private UploaderConfiguration uploaderConfiguration;
@@ -84,6 +87,14 @@ public class MultipartUploadInfo {
     }
 
     /**
+     * Digest of the local file.
+     * @return
+     */
+    public String getDigest() {
+        return digest;
+    }
+
+    /**
      * @return List of the part uploads that already have been performed.
      */
     public List<FinishedUpload> getFinishedUploads() {
@@ -116,5 +127,9 @@ public class MultipartUploadInfo {
 
     public void setUploaderConfiguration(final UploaderConfiguration uploaderConfiguration) {
         this.uploaderConfiguration = uploaderConfiguration;
+    }
+
+    public void setDigest(final String digest) {
+        this.digest = digest;
     }
 }
