@@ -24,7 +24,7 @@
     <properties>
         <aws.java.sdk.version>1.11.228</aws.java.sdk.version>
         <spring.version>5.0.0.RELEASE</spring.version>
-        <cli-helper.version>2.0</cli-helper.version>
+        <cli-helper.version>2.1</cli-helper.version>
         <h2.version>1.4.196</h2.version>
         <hibernate.version>5.2.12.Final</hibernate.version>
         <spring-data.version>2.0.1.RELEASE</spring-data.version>
