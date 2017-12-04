@@ -15,14 +15,14 @@ import java.util.Optional;
 public interface UploaderConfigurationService {
 
     /**
-     * Find configuration by name
+     * Find configuration by name.
      * @param name
      * @return
      */
     Optional<UploaderConfiguration> findByName(String name);
 
     /**
-     * Creates configuration
+     * Creates configuration.
      * @param configuration
      * @return Created configuration
      * @throws InvalidConfigurationException If configuration is invalid
