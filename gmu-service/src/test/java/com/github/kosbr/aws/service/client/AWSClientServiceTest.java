@@ -66,6 +66,14 @@ public class AWSClientServiceTest {
         verifyNoMoreInteractions(client);
     }
 
+    @Test(expected = NoActiveConfiguration.class)
+    public void testInitUploadWithoutActiveConfiguration() throws NoActiveConfiguration {
+        when(glacierHolder.getClient())
+                .thenThrow(new NoActiveConfiguration("No active config"));
+
+        awsClientService.initiateMultipartUpload(VAULT_NAME, DESCRIPTION, PART_SIZE);
+    }
+
     @Test
     public void testCompleteUpload() throws NoActiveConfiguration {
         final AmazonGlacier client = mock(AmazonGlacier.class);
