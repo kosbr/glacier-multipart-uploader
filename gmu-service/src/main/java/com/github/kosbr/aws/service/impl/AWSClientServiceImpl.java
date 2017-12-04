@@ -28,13 +28,12 @@ public class AWSClientServiceImpl implements AWSClientService {
     private AWSGlacierHolder glacierHolder;
 
     @Override
-    public String initiateMultipartUpload(final String vaultName, final int partSize)
+    public String initiateMultipartUpload(final String vaultName, final String description, final int partSize)
             throws NoActiveConfiguration {
         final AmazonGlacier client = glacierHolder.getClient();
         final InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest()
                 .withVaultName(vaultName)
-                // todo use more specific name
-                .withArchiveDescription("my archive " + (new Date()))
+                .withArchiveDescription(description)
                 .withPartSize(Integer.toString(partSize));
 
         final InitiateMultipartUploadResult result = client.initiateMultipartUpload(request);

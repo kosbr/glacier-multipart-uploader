@@ -19,11 +19,12 @@ public interface AWSClientService {
     /**
      * Initiate an upload.
      * @param vaultName The name of existing vault for uploading.
+     * @param description Archive description.
      * @param partSize The size of a part in bytes.
      * @return AWS upload id.
      * @throws NoActiveConfiguration
      */
-    String initiateMultipartUpload(String vaultName, int partSize) throws NoActiveConfiguration;
+    String initiateMultipartUpload(String vaultName, String description, int partSize) throws NoActiveConfiguration;
 
     /**
      * Complete multipart upload. It is considered, that all parts have been uploaded.

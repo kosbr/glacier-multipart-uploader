@@ -35,7 +35,8 @@ public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions
         try {
 
             final String digest = fileDigestService.calculateSha256Hex(options.getArchiveLocalPath());
-            final String uploadId = client.initiateMultipartUpload(options.getVault(), PART_SIZE);
+            final String uploadId = client.initiateMultipartUpload(options.getVault(), options.getDescription(),
+                    PART_SIZE);
 
             final MultipartUploadInfo uploadInfo = new MultipartUploadInfo();
             uploadInfo.setBufferSize(PART_SIZE);
