@@ -87,6 +87,37 @@ public class AWSClientServiceUploadPartsTest {
     }
 
     @Test
+    public void testUploadPartsNotFromTheBeginning() throws NoActiveConfiguration, IOException {
+        final AmazonGlacier client = mock(AmazonGlacier.class);
+        when(glacierHolder.getClient())
+                .thenReturn(client);
+
+        final String localPath = getClass().getClassLoader().getResource("big-file").getPath();
+
+        when(client.uploadMultipartPart(any()))
+                .thenReturn(createResult(PART_2_CHECKSUM))
+                .thenReturn(createResult(PART_3_CHECKSUM));
+
+        awsClientService.uploadParts(localPath, UPLOAD_ID, VAULT_NAME, BUFFER_SIZE, 12,
+                (beginByte, endByte, checkSum, progressInPercents) -> {
+                    // do nothing here
+                });
+
+        final ArgumentCaptor<UploadMultipartPartRequest> requestCaptor =
+                ArgumentCaptor.forClass(UploadMultipartPartRequest.class);
+        verify(client, times(2)).uploadMultipartPart(requestCaptor.capture());
+
+        verifyNoMoreInteractions(client);
+
+        final List<UploadMultipartPartRequest> capturedRequests = requestCaptor.getAllValues();
+        checkEqual(createExpectedRequest(PART_2_CHECKSUM, PART_2_RANGE, PART_2_CONTENT),
+                capturedRequests.get(0));
+        checkEqual(createExpectedRequest(PART_3_CHECKSUM, PART_3_RANGE, PART_3_CONTENT),
+                capturedRequests.get(1));
+    }
+
+
+    @Test
     public void testReturnCorrectIntermediateResults() throws NoActiveConfiguration, IOException {
         final AmazonGlacier client = mock(AmazonGlacier.class);
         when(glacierHolder.getClient())
