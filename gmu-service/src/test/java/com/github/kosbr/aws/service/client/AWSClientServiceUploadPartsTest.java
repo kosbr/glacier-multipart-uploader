@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
@@ -67,7 +68,7 @@ public class AWSClientServiceUploadPartsTest {
 
         awsClientService.uploadParts(localPath, UPLOAD_ID, VAULT_NAME, BUFFER_SIZE, 0,
                 (beginByte, endByte, checkSum, progressInPercents) -> {
-
+            // do nothing here
         });
 
         final ArgumentCaptor<UploadMultipartPartRequest> requestCaptor =
@@ -84,6 +85,37 @@ public class AWSClientServiceUploadPartsTest {
         checkEqual(createExpectedRequest(PART_3_CHECKSUM, PART_3_RANGE, PART_3_CONTENT),
                 capturedRequests.get(2));
     }
+
+    @Test
+    public void testReturnCorrectIntermediateResults() throws NoActiveConfiguration, IOException {
+        final AmazonGlacier client = mock(AmazonGlacier.class);
+        when(glacierHolder.getClient())
+                .thenReturn(client);
+
+        final String localPath = getClass().getClassLoader().getResource("big-file").getPath();
+
+        when(client.uploadMultipartPart(any()))
+                .thenReturn(createResult(PART_1_CHECKSUM))
+                .thenReturn(createResult(PART_2_CHECKSUM))
+                .thenReturn(createResult(PART_3_CHECKSUM));
+
+
+        final List<UploadPartIntermediateResult> actualIntermediateResultList = new ArrayList<>(3);
+        awsClientService.uploadParts(localPath, UPLOAD_ID, VAULT_NAME, BUFFER_SIZE, 0,
+                (beginByte, endByte, checkSum, progressInPercents) -> {
+                    final UploadPartIntermediateResult intermediateResult = new UploadPartIntermediateResult();
+                    intermediateResult.setProgressInPercents(progressInPercents);
+                    intermediateResult.setCheckSum(checkSum);
+                    intermediateResult.setBeginByte(beginByte);
+                    intermediateResult.setEndByte(endByte);
+                    actualIntermediateResultList.add(intermediateResult);
+                });
+
+        Assert.assertEquals(createExpectedIntermediateResultList(), actualIntermediateResultList);
+    }
+
+
+
 
     private UploadMultipartPartRequest createExpectedRequest(final String checksum, final String range,
                                                              final String content) {
@@ -110,5 +142,33 @@ public class AWSClientServiceUploadPartsTest {
         expected.setBody(null);
         actual.setBody(null);
         Assert.assertEquals(expected, actual);
+    }
+
+    private List<UploadPartIntermediateResult> createExpectedIntermediateResultList() {
+        final List<UploadPartIntermediateResult> results = new ArrayList<>(3);
+
+        final UploadPartIntermediateResult result1 = new UploadPartIntermediateResult();
+        result1.setBeginByte(0);
+        result1.setEndByte(11);
+        result1.setCheckSum(PART_1_CHECKSUM);
+        result1.setProgressInPercents(46);
+
+        final UploadPartIntermediateResult result2 = new UploadPartIntermediateResult();
+        result2.setBeginByte(12);
+        result2.setEndByte(23);
+        result2.setCheckSum(PART_2_CHECKSUM);
+        result2.setProgressInPercents(92);
+
+        final UploadPartIntermediateResult result3 = new UploadPartIntermediateResult();
+        result3.setBeginByte(24);
+        result3.setEndByte(25);
+        result3.setCheckSum(PART_3_CHECKSUM);
+        result3.setProgressInPercents(100);
+
+        results.add(result1);
+        results.add(result2);
+        results.add(result3);
+
+        return results;
     }
 }
