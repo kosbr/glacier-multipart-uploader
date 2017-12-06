@@ -10,7 +10,7 @@
 
     <appender name="GLACIER_UPLOADER_LOG_FILE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>glacier-uploader.log</file>
+        <file>${user.home}/.aws/glacier-uploader.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
             </Pattern>
@@ -29,7 +29,7 @@
 
     </appender>
 
-    <logger name="com.github.kosbr.aws" level="FATAL">
+    <logger name="com.github.kosbr.aws" level="ERROR">
         <appender-ref ref="STDOUT"/>
     </logger>
 
