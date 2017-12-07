@@ -11,6 +11,12 @@ Glacier.
 * Proceeding upload if it was interrupted (useful for big files)
 * AWS Glacier configuration storing 
 
+## To be done
+
+* Improve test coverage
+* View for a Vault inventory (probably in separate application)
+* Downloading an archive in chunks (probably in separate application)
+
 ## Requirements
 
 ### System requirements 
