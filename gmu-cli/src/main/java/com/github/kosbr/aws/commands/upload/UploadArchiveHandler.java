@@ -16,7 +16,7 @@ import java.io.PrintStream;
 public class UploadArchiveHandler implements CommandHandler<UploadArchiveOptions> {
 
     // This example works for part sizes up to 1 GB.
-    private static final Integer PART_SIZE = 1048576;
+    public static final Integer PART_SIZE = 1048576;
 
     @Autowired
     private AWSClientService client;

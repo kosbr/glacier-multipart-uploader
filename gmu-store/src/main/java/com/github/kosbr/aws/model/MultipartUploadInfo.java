@@ -132,4 +132,8 @@ public class MultipartUploadInfo {
     public void setDigest(final String digest) {
         this.digest = digest;
     }
+
+    public void setId(final Long id) {
+        this.id = id;
+    }
 }
