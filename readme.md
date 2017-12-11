@@ -155,7 +155,7 @@ exit
 ```
 
 ## Video example
-<iframe src="https://player.vimeo.com/video/246781733" style="display:block; margin:0 auto;" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+https://vimeo.com/246781733
 
 
 
